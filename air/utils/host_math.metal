@@ -13,13 +13,13 @@ constant uint32_t UINT32_MAX = numeric_limits<uint32_t>::max();
 namespace host_math {
 
   // return x + y with uint32_t operands
-  static  uint32_t add(const uint32_t x, const uint32_t y) { return x + y; }
+  static inline uint32_t add(const uint32_t x, const uint32_t y) { return x + y; }
 
   // return x + y + carry with uint32_t operands
-  static  uint32_t addc(const uint32_t x, const uint32_t y, const uint32_t carry) { return x + y + carry; }
+  static inline uint32_t addc(const uint32_t x, const uint32_t y, const uint32_t carry) { return x + y + carry; }
 
   // return x + y and carry out with uint32_t operands
-  static  uint32_t add_cc(const uint32_t x, const uint32_t y, device uint32_t& carry)
+  static inline uint32_t add_cc(const uint32_t x, const uint32_t y, device uint32_t& carry)
   {
     uint32_t result;
     result = x + y;
@@ -28,7 +28,7 @@ namespace host_math {
   }
 
   // return x + y + carry and carry out  with uint32_t operands
-  static  uint32_t addc_cc(const uint32_t x, const uint32_t y, device uint32_t& carry)
+  static inline uint32_t addc_cc(const uint32_t x, const uint32_t y, device uint32_t& carry)
   {
     const uint32_t result = x + y + carry;
     carry = carry && x >= result || !carry && x > result;
@@ -36,13 +36,13 @@ namespace host_math {
   }
 
   // return x - y with uint32_t operands
-  static  uint32_t sub(const uint32_t x, const uint32_t y) { return x - y; }
+  static inline uint32_t sub(const uint32_t x, const uint32_t y) { return x - y; }
 
   //     return x - y - borrow with uint32_t operands
-  static  uint32_t subc(const uint32_t x, const uint32_t y, const uint32_t borrow) { return x - y - borrow; }
+  static inline uint32_t subc(const uint32_t x, const uint32_t y, const uint32_t borrow) { return x - y - borrow; }
 
   //    return x - y and borrow out with uint32_t operands
-  static  uint32_t sub_cc(const uint32_t x, const uint32_t y, device uint32_t& borrow)
+  static inline uint32_t sub_cc(const uint32_t x, const uint32_t y, device uint32_t& borrow)
   {
     uint32_t result;
     result = x - y;
@@ -51,7 +51,7 @@ namespace host_math {
   }
 
   //    return x - y - borrow and borrow out with uint32_t operands
-  static  uint32_t subc_cc(const uint32_t x, const uint32_t y, device uint32_t& borrow)
+  static inline uint32_t subc_cc(const uint32_t x, const uint32_t y, device uint32_t& borrow)
   {
     const uint32_t result = x - y - borrow;
     borrow = borrow && x <= result || !borrow && x < result;
@@ -59,7 +59,7 @@ namespace host_math {
   }
 
   // return x * y + z + carry and carry out with uint32_t operands
-  static  uint32_t madc_cc(const uint32_t x, const uint32_t y, const uint32_t z, device uint32_t& carry)
+  static inline uint32_t madc_cc(const uint32_t x, const uint32_t y, const uint32_t z, thread uint32_t& carry)
   {
     uint32_t result;
     uint64_t r = static_cast<uint64_t>(x) * y + z + carry;
@@ -72,9 +72,9 @@ namespace host_math {
   struct carry_chain {
     unsigned index;
 
-    constexpr  inline carry_chain() : index(0) {}
+    constexpr inline carry_chain() : index(0) {}
 
-     inline uint32_t add(const uint32_t x, const uint32_t y, device uint32_t& carry)
+    inline uint32_t add(const uint32_t x, const uint32_t y, device uint32_t& carry)
     {
       index++;
       if (index == 1 && OPS_COUNT == 1 && !CARRY_IN && !CARRY_OUT)
@@ -87,7 +87,7 @@ namespace host_math {
         return host_math::addc(x, y, carry);
     }
 
-     inline uint32_t sub(const uint32_t x, const uint32_t y, device uint32_t& carry)
+    inline uint32_t sub(const uint32_t x, const uint32_t y, device uint32_t& carry)
     {
       index++;
       if (index == 1 && OPS_COUNT == 1 && !CARRY_IN && !CARRY_OUT)

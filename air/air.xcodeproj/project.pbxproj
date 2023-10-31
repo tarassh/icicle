@@ -1,0 +1,173 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		67E2AE8E2AF1766600FFD848 /* air.metal in Sources */ = {isa = PBXBuildFile; fileRef = 67E2AE8D2AF1766600FFD848 /* air.metal */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		67E2AE8A2AF1766600FFD848 /* air.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = air.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
+		67E2AE8D2AF1766600FFD848 /* air.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = air.metal; sourceTree = "<group>"; };
+		67E2AE942AF176C900FFD848 /* primitives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = primitives; sourceTree = "<group>"; };
+		67E2AE952AF176C900FFD848 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; path = utils; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		67E2AE832AF1766600FFD848 = {
+			isa = PBXGroup;
+			children = (
+				67E2AE942AF176C900FFD848 /* primitives */,
+				67E2AE952AF176C900FFD848 /* utils */,
+				67E2AE8C2AF1766600FFD848 /* air */,
+				67E2AE8B2AF1766600FFD848 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		67E2AE8B2AF1766600FFD848 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				67E2AE8A2AF1766600FFD848 /* air.metallib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		67E2AE8C2AF1766600FFD848 /* air */ = {
+			isa = PBXGroup;
+			children = (
+				67E2AE8D2AF1766600FFD848 /* air.metal */,
+			);
+			path = air;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		67E2AE892AF1766600FFD848 /* air */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "air" */;
+			buildPhases = (
+				67E2AE882AF1766600FFD848 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = air;
+			productName = air;
+			productReference = 67E2AE8A2AF1766600FFD848 /* air.metallib */;
+			productType = "com.apple.product-type.metal-library";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		67E2AE842AF1766600FFD848 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					67E2AE892AF1766600FFD848 = {
+						CreatedOnToolsVersion = 15.0.1;
+					};
+				};
+			};
+			buildConfigurationList = 67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "air" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 67E2AE832AF1766600FFD848;
+			productRefGroup = 67E2AE8B2AF1766600FFD848 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				67E2AE892AF1766600FFD848 /* air */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		67E2AE882AF1766600FFD848 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				67E2AE8E2AF1766600FFD848 /* air.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		67E2AE8F2AF1766600FFD848 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		67E2AE902AF1766600FFD848 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		67E2AE922AF1766600FFD848 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C63W8A96FV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		67E2AE932AF1766600FFD848 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = C63W8A96FV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "air" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				67E2AE8F2AF1766600FFD848 /* Debug */,
+				67E2AE902AF1766600FFD848 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "air" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				67E2AE922AF1766600FFD848 /* Debug */,
+				67E2AE932AF1766600FFD848 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 67E2AE842AF1766600FFD848 /* Project object */;
+}

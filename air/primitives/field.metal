@@ -8,6 +8,7 @@
 #include "../utils/host_math.metal"
 #include "../utils/ptx.metal"
 #include "../utils/storage.metal"
+#include "../utils/mt.metal"
 #include <metal_stdlib>
 using namespace metal;
 
@@ -200,22 +201,23 @@ public:
     device const uint32_t* y = ys.limbs;
     device uint32_t* r = rs.limbs;
       bool borrow = false;
-    r[0] = SUBTRACT ? ptx::sub_cc(x[0], y[0], borrow) : ptx::add_cc(x[0], y[0], borrow);
+      bool carry_out = false;
+    r[0] = SUBTRACT ? ptx::sub_cc(x[0], y[0], false, carry_out) : ptx::add_cc(x[0], y[0], false, carry_out);
     for (unsigned i = 1; i < (CARRY_OUT ? 2 * TLC : 2 * TLC - 1); i++)
-      r[i] = SUBTRACT ? ptx::subc_cc(x[i], y[i]) : ptx::addc_cc(x[i], y[i]);
+      r[i] = SUBTRACT ? ptx::subc_cc(x[i], y[i], borrow) : ptx::addc_cc(x[i], y[i], borrow);
     if (!CARRY_OUT) {
-      r[2 * TLC - 1] = SUBTRACT ? ptx::subc(x[2 * TLC - 1], y[2 * TLC - 1]) : ptx::addc(x[2 * TLC - 1], y[2 * TLC - 1]);
+      r[2 * TLC - 1] = SUBTRACT ? ptx::subc(x[2 * TLC - 1], y[2 * TLC - 1], borrow) : ptx::addc(x[2 * TLC - 1], y[2 * TLC - 1], borrow);
       return 0;
     }
-    return SUBTRACT ? ptx::subc(0, 0) : ptx::addc(0, 0);
+    return SUBTRACT ? ptx::subc(0, 0, borrow) : ptx::addc(0, 0, borrow);
   }
 
   template <bool SUBTRACT, bool CARRY_OUT>
   static constexpr inline uint32_t add_sub_limbs_host(device const ff_storage& xs, device const ff_storage& ys, device ff_storage& rs)
   {
-    const uint32_t* x = xs.limbs;
-    const uint32_t* y = ys.limbs;
-    uint32_t* r = rs.limbs;
+    device const uint32_t* x = xs.limbs;
+    device const uint32_t* y = ys.limbs;
+    device uint32_t* r = rs.limbs;
     uint32_t carry = 0;
     host_math::carry_chain<TLC, false, CARRY_OUT> chain;
     for (unsigned i = 0; i < TLC; i++)
@@ -227,9 +229,9 @@ public:
   static constexpr inline uint32_t
   add_sub_limbs_host(device const ff_wide_storage& xs, device const ff_wide_storage& ys, device ff_wide_storage& rs)
   {
-    const uint32_t* x = xs.limbs;
-    const uint32_t* y = ys.limbs;
-    uint32_t* r = rs.limbs;
+    device const uint32_t* x = xs.limbs;
+    device const uint32_t* y = ys.limbs;
+    device uint32_t* r = rs.limbs;
     uint32_t carry = 0;
     host_math::carry_chain<2 * TLC, false, CARRY_OUT> chain;
     for (unsigned i = 0; i < 2 * TLC; i++)
@@ -305,11 +307,12 @@ public:
   {
     // odd = odd + bi*A
     // even = even + bi*A
+      bool borrow = false;
     cmad_n(odd, a + 1, bi, n - 2);
     odd[n - 2] = ptx::madc_lo_cc(a[n - 1], bi, 0);
     odd[n - 1] = ptx::madc_hi(a[n - 1], bi, 0);
     cmad_n(even, a, bi, n);
-    odd[n - 1] = ptx::addc(odd[n - 1], 0);
+    odd[n - 1] = ptx::addc(odd[n - 1], 0, borrow);
   }
 
   static inline void
@@ -317,19 +320,21 @@ public:
   {
     // odd = odd + bi*A
     // even = even + bi*A
+      bool borrow = false;
     cmad_n_msb(odd, a + 1, bi, n - 2, a_start_idx - 1);
     odd[n - 2] = ptx::madc_lo_cc(a[n - 1], bi, 0);
     odd[n - 1] = ptx::madc_hi(a[n - 1], bi, 0);
     cmad_n_msb(even, a, bi, n, a_start_idx);
-    odd[n - 1] = ptx::addc(odd[n - 1], 0);
+    odd[n - 1] = ptx::addc(odd[n - 1], 0, borrow);
   }
 
   static inline void multiply_raw_device(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* even = rs.limbs;
-    __align__(8) uint32_t odd[2 * TLC - 2];
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    device uint32_t* even = rs.limbs;
+      bool borrow = false;
+    alignas(8) uint32_t odd[2 * TLC - 2];
     mul_n(even, a, b[0]);
     mul_n(odd, a + 1, b[0]);
     mad_row(&even[2], &odd[0], a, b[1]);
@@ -342,8 +347,8 @@ public:
     // merge |even| and |odd|
     even[1] = ptx::add_cc(even[1], odd[0]);
     for (i = 1; i < 2 * TLC - 2; i++)
-      even[i + 1] = ptx::addc_cc(even[i + 1], odd[i]);
-    even[i + 1] = ptx::addc(even[i + 1], 0);
+      even[i + 1] = ptx::addc_cc(even[i + 1], odd[i], borrow);
+    even[i + 1] = ptx::addc(even[i + 1], 0, borrow);
   }
 
   static inline void mult_no_carry(uint32_t a, uint32_t b, device uint32_t* r)
@@ -354,12 +359,12 @@ public:
 
   static inline void ingo_multiply_raw_device(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* r = rs.limbs;
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    bool borrow = false;
     uint32_t i, j;
-    uint32_t* even = rs.limbs;
-    __align__(8) uint32_t odd[2 * TLC];
+    device uint32_t* even = rs.limbs;
+    alignas(8) uint32_t odd[2 * TLC];
     for (uint32_t i = 0; i < 2 * TLC; i++) {
       even[i] = 0;
       odd[i] = 0;
@@ -405,7 +410,7 @@ public:
         even[i + j + 1] = ptx::madc_lo_cc(a[j], b[i + 1], even[i + j + 1]);
         even[i + j + 2] = ptx::madc_hi_cc(a[j], b[i + 1], even[i + j + 2]);
       }
-      even[i + j + 1] = ptx::addc(even[i + j + 1], 0); // handling last carry
+      even[i + j + 1] = ptx::addc(even[i + j + 1], 0, borrow); // handling last carry
 
       // multiply accumulate odd part of new row with odd part of prev row
       // j = 1, no carry in, only carry out
@@ -441,18 +446,18 @@ public:
     even[1] = ptx::add_cc(even[1], odd[0]);
     for (i = 1; i < 2 * TLC - 2; i++)
       even[i + 1] = ptx::addc_cc(even[i + 1], odd[i]);
-    even[i + 1] = ptx::addc(even[i + 1], 0);
+    even[i + 1] = ptx::addc(even[i + 1], 0, borrow);
   }
 
   static inline void
   ingo_msb_multiply_raw_device(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* r = rs.limbs;
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    bool borrow = false;
     uint32_t i, j;
-    uint32_t* even = rs.limbs;
-    __align__(8) uint32_t odd[2 * TLC];
+    device uint32_t* even = rs.limbs;
+    alignas(8) uint32_t odd[2 * TLC];
     for (uint32_t i = 0; i < 2 * TLC; i++) {
       even[i] = 0;
       odd[i] = 0;
@@ -506,7 +511,7 @@ public:
         even[i + j + 1] = ptx::madc_lo_cc(a[j], b[i + 1], even[i + j + 1]);
         even[i + j + 2] = ptx::madc_hi_cc(a[j], b[i + 1], even[i + j + 2]);
       }
-      even[i + j + 1] = ptx::addc(even[i + j + 1], 0); // handling last carry
+      even[i + j + 1] = ptx::addc(even[i + j + 1], 0, borrow); // handling last carry
 
       // multiply accumulate odd part of new row with odd part of prev row
       // j = 1, no carry in, only carry out
@@ -548,16 +553,17 @@ public:
 #pragma unroll
     for (i = 1; i < 2 * TLC - 2; i++)
       even[i + 1] = ptx::addc_cc(even[i + 1], odd[i]);
-    even[i + 1] = ptx::addc(even[i + 1], 0);
+    even[i + 1] = ptx::addc(even[i + 1], 0, borrow);
   }
 
   static inline void multiply_lsb_raw_device(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
     // r = a * b is correcrt for the first TLC + 1 digits. (not computing from TLC + 1 to 2*TLC - 2).
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* even = rs.limbs;
-    __align__(8) uint32_t odd[2 * TLC - 2];
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    device uint32_t* even = rs.limbs;
+      bool borrow = false;
+    alignas(8) uint32_t odd[2 * TLC - 2];
     mul_n(even, a, b[0]);
     mul_n(odd, a + 1, b[0]);
     mad_row(&even[2], &odd[0], a, b[1]);
@@ -572,15 +578,16 @@ public:
     even[1] = ptx::add_cc(even[1], odd[0]);
     for (i = 1; i < TLC + 1; i++)
       even[i + 1] = ptx::addc_cc(even[i + 1], odd[i]);
-    even[i + 1] = ptx::addc(even[i + 1], 0);
+    even[i + 1] = ptx::addc(even[i + 1], 0, borrow);
   }
 
   static inline void multiply_msb_raw_device(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* even = rs.limbs;
-    __align__(8) uint32_t odd[2 * TLC - 2];
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    device uint32_t* even = rs.limbs;
+      bool borrow = false;
+    alignas(8) uint32_t odd[2 * TLC - 2];
     for (int i = 0; i < 2 * TLC - 1; i++) {
       even[i] = 0;
       odd[i] = 0;
@@ -600,14 +607,14 @@ public:
     even[1] = ptx::add_cc(even[1], odd[0]);
     for (i = 1; i < 2 * TLC - 2; i++)
       even[i + 1] = ptx::addc_cc(even[i + 1], odd[i]);
-    even[i + 1] = ptx::addc(even[i + 1], 0);
+    even[i + 1] = ptx::addc(even[i + 1], 0, borrow);
   }
 
   static inline void multiply_raw_host(device const ff_storage& as, device const ff_storage& bs, device ff_wide_storage& rs)
   {
-    const uint32_t* a = as.limbs;
-    const uint32_t* b = bs.limbs;
-    uint32_t* r = rs.limbs;
+    device const uint32_t* a = as.limbs;
+    device const uint32_t* b = bs.limbs;
+    device uint32_t* r = rs.limbs;
     for (unsigned i = 0; i < TLC; i++) {
       uint32_t carry = 0;
       for (unsigned j = 0; j < TLC; j++)
@@ -634,7 +641,7 @@ public:
 public:
   ff_storage limbs_storage;
 
-  inline device uint32_t* export_limbs() { return (uint32_t*)limbs_storage.limbs; }
+  inline device uint32_t* export_limbs() { return (device uint32_t*)limbs_storage.limbs; }
 
   inline unsigned get_scalar_digit(unsigned digit_num, unsigned digit_width)
   {
@@ -650,12 +657,10 @@ public:
 
   static inline Field rand_host()
   {
-    std::random_device rd;
-    std::mt19937_64 generator(rd());
-    std::uniform_int_distribution<unsigned> distribution;
+    mt19937 mt;
     Field value{};
     for (unsigned i = 0; i < TLC; i++)
-      value.limbs_storage.limbs[i] = distribution(generator);
+        value.limbs_storage.limbs[i] = mt.rand();
     while (lt(modulus(), value))
       value = value - modulus();
     return value;
@@ -698,21 +703,19 @@ public:
   static constexpr inline uint32_t
   sub_limbs_partial_device(device uint32_t* x, device uint32_t* y, device uint32_t* r, uint32_t num_limbs)
   {
-    r[0] = ptx::sub_cc(x[0], y[0]);
+      bool carry = false;
+      bool borrow = false;
+    r[0] = ptx::sub_cc(x[0], y[0], false, carry);
 #pragma unroll
     for (unsigned i = 1; i < num_limbs; i++)
-      r[i] = ptx::subc_cc(x[i], y[i]);
-    return ptx::subc(0, 0);
+      r[i] = ptx::subc_cc(x[i], y[i], borrow);
+    return ptx::subc(0, 0, borrow);
   }
 
   static constexpr inline uint32_t
   sub_limbs_partial(device uint32_t* x, device uint32_t* y, device uint32_t* r, uint32_t num_limbs)
   {
-#ifdef __CUDA_ARCH__
-    return sub_limbs_partial_device(x, y, r, num_limbs);
-#else
     return sub_limbs_partial_host(x, y, r, num_limbs);
-#endif
   }
 
   template <unsigned MODULUS_MULTIPLE = 1>
@@ -759,8 +762,7 @@ public:
   static inline Field mul_const(device const Field& xs)
   {
     Field mul = multiplier;
-    static bool is_u32 = true;
-inline
+    bool is_u32 = true;
     for (unsigned i = 1; i < TLC; i++)
       is_u32 &= (mul.limbs_storage.limbs[i] == 0);
 
@@ -774,13 +776,13 @@ inline
     T rs = {};
     T temp = xs;
     bool is_zero = true;
-inline
+
     for (unsigned i = 0; i < 32; i++) {
       if (mutliplier & (1 << i)) {
         rs = is_zero ? temp : (rs + temp);
         is_zero = false;
       }
-      if (mutliplier & ((1 << (31 - i) - 1) << (i + 1))) break;
+        if (mutliplier & ((1 << ((31 - i) - 1)) << (i + 1))) break;
       temp = temp + temp;
     }
     return rs;
@@ -812,9 +814,9 @@ inline
   template <unsigned MODULUS_MULTIPLE = 1>
   static constexpr inline Field div2(device const Field& xs)
   {
-    const uint32_t* x = xs.limbs_storage.limbs;
+    device const uint32_t* x = xs.limbs_storage.limbs;
     Field rs = {};
-    uint32_t* r = rs.limbs_storage.limbs;
+    device uint32_t* r = rs.limbs_storage.limbs;
     for (unsigned i = 0; i < TLC - 1; i++) {
       r[i] = (x[i] >> 1) | (x[i + 1] << 31);
     }
