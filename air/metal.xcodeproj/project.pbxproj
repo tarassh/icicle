@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		67E2AE8E2AF1766600FFD848 /* air.metal in Sources */ = {isa = PBXBuildFile; fileRef = 67E2AE8D2AF1766600FFD848 /* air.metal */; };
+		67E2AE8E2AF1766600FFD848 /* metal.metal in Sources */ = {isa = PBXBuildFile; fileRef = 67E2AE8D2AF1766600FFD848 /* metal.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		67E2AE8A2AF1766600FFD848 /* air.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = air.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
-		67E2AE8D2AF1766600FFD848 /* air.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = air.metal; sourceTree = "<group>"; };
+		67E2AE8A2AF1766600FFD848 /* metal.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = metal.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
+		67E2AE8D2AF1766600FFD848 /* metal.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = metal.metal; sourceTree = "<group>"; };
 		67E2AE942AF176C900FFD848 /* primitives */ = {isa = PBXFileReference; lastKnownFileType = folder; path = primitives; sourceTree = "<group>"; };
 		67E2AE952AF176C900FFD848 /* utils */ = {isa = PBXFileReference; lastKnownFileType = folder; path = utils; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -23,7 +23,7 @@
 			children = (
 				67E2AE942AF176C900FFD848 /* primitives */,
 				67E2AE952AF176C900FFD848 /* utils */,
-				67E2AE8C2AF1766600FFD848 /* air */,
+				67E2AE8C2AF1766600FFD848 /* metal */,
 				67E2AE8B2AF1766600FFD848 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -31,25 +31,25 @@
 		67E2AE8B2AF1766600FFD848 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				67E2AE8A2AF1766600FFD848 /* air.metallib */,
+				67E2AE8A2AF1766600FFD848 /* metal.metallib */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		67E2AE8C2AF1766600FFD848 /* air */ = {
+		67E2AE8C2AF1766600FFD848 /* metal */ = {
 			isa = PBXGroup;
 			children = (
-				67E2AE8D2AF1766600FFD848 /* air.metal */,
+				67E2AE8D2AF1766600FFD848 /* metal.metal */,
 			);
-			path = air;
+			path = metal;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		67E2AE892AF1766600FFD848 /* air */ = {
+		67E2AE892AF1766600FFD848 /* metal */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "air" */;
+			buildConfigurationList = 67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "metal" */;
 			buildPhases = (
 				67E2AE882AF1766600FFD848 /* Sources */,
 			);
@@ -57,9 +57,9 @@
 			);
 			dependencies = (
 			);
-			name = air;
+			name = metal;
 			productName = air;
-			productReference = 67E2AE8A2AF1766600FFD848 /* air.metallib */;
+			productReference = 67E2AE8A2AF1766600FFD848 /* metal.metallib */;
 			productType = "com.apple.product-type.metal-library";
 		};
 /* End PBXNativeTarget section */
@@ -76,7 +76,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "air" */;
+			buildConfigurationList = 67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "metal" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -89,7 +89,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				67E2AE892AF1766600FFD848 /* air */,
+				67E2AE892AF1766600FFD848 /* metal */,
 			);
 		};
 /* End PBXProject section */
@@ -99,7 +99,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				67E2AE8E2AF1766600FFD848 /* air.metal in Sources */,
+				67E2AE8E2AF1766600FFD848 /* metal.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,7 +149,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "air" */ = {
+		67E2AE872AF1766600FFD848 /* Build configuration list for PBXProject "metal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				67E2AE8F2AF1766600FFD848 /* Debug */,
@@ -158,7 +158,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "air" */ = {
+		67E2AE912AF1766600FFD848 /* Build configuration list for PBXNativeTarget "metal" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				67E2AE922AF1766600FFD848 /* Debug */,
