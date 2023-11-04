@@ -1,9 +1,11 @@
 //
-//  primitives.metal
+//  filed.metal
 //  Test
 //
 //  Created by Taras Shchybovyk on 31.10.2023.
 //
+//
+#pragma once
 
 #include "../utils/host_math.metal"
 #include "../utils/mt.metal"
@@ -882,3 +884,4 @@ public:
         return (u == one) ? b : c;
     }
 };
+
