@@ -8,6 +8,7 @@
 #include "../primitives/field.metal"
 #include "../primitives/affine.metal"
 #include "../primitives/projective.metal"
+#include "../app/msm.metal"
 #include <metal_stdlib>
 using namespace metal;
 
