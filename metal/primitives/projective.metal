@@ -27,13 +27,13 @@ public:
     return {point.x * denom, point.y * denom};
   }
 
-  static inline Projective from_affine(thread const Affine<FF>& point) { return {point.x, point.y, FF::one()}; }
+  static inline Projective from_affine(device const Affine<FF>& point) { return {point.x, point.y, FF::one()}; }
 
   static inline Projective generator() { return {GENERATOR_X, GENERATOR_Y, FF::one()}; }
 
   static inline Projective neg(thread const Projective& point) { return {point.x, FF::neg(point.y), point.z}; }
 
-  friend inline Projective operator+(Projective p1, thread const Projective& p2)
+  friend inline Projective operator+(Projective p1, device const Projective& p2)
   {
     const FF X1 = p1.x;                                                                //                   < 2
     const FF Y1 = p1.y;                                                                //                   < 2
@@ -127,11 +127,11 @@ public:
     return p1 + Affine<FF>::neg(p2);
   }
 
-  friend inline Projective operator*(SCALAR_FF scalar, thread const Projective& point)
+  friend inline Projective operator*(SCALAR_FF scalar, device const Projective& point)
   {
     Projective res = zero();
 #pragma unroll
-    for (int i = 0; i < SCALAR_FF::NBITS; i++) {
+    for (uint i = 0; i < SCALAR_FF::NBITS; i++) {
       if (i > 0) { res = res + res; }
       if (scalar.get_scalar_digit(SCALAR_FF::NBITS - i - 1, 1)) { res = res + point; }
     }

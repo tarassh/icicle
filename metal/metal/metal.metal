@@ -10,6 +10,7 @@
 #include "../primitives/projective.metal"
 #include "../app/msm.metal"
 #include "../curves/bn254/curve_config.metal"
+#include "../curves/bn254/msm.metal"
 #include <metal_stdlib>
 using namespace metal;
 
