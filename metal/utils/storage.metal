@@ -4,7 +4,7 @@
 //
 //  Created by Taras Shchybovyk on 31.10.2023.
 //
-
+#pragma once
 #include <metal_stdlib>
 using namespace metal;
 

@@ -11,6 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		674E47F52AF698F9001406ED /* curves */ = {isa = PBXFileReference; lastKnownFileType = folder; path = curves; sourceTree = "<group>"; };
 		67CBFAFD2AF6647100F18DE2 /* app */ = {isa = PBXFileReference; lastKnownFileType = folder; path = app; sourceTree = "<group>"; };
 		67E2AE8A2AF1766600FFD848 /* metal.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = metal.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
 		67E2AE8D2AF1766600FFD848 /* metal.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = metal.metal; sourceTree = "<group>"; };
@@ -22,6 +23,7 @@
 		67E2AE832AF1766600FFD848 = {
 			isa = PBXGroup;
 			children = (
+				674E47F52AF698F9001406ED /* curves */,
 				67CBFAFD2AF6647100F18DE2 /* app */,
 				67E2AE942AF176C900FFD848 /* primitives */,
 				67E2AE952AF176C900FFD848 /* utils */,
